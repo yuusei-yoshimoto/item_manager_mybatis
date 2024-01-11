@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ItemMapper">
+	<resultMap type="com.example.entity.Item" id="itemMap">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="price" property="price"/>
+		<result column="deleted_at" property="deletedAt"/>
+		<result column="category_id" property="categoryId"/>
+		<result column="stock" property="stock"/>
+		<association property="category" javaType="com.example.entity.Category">
+			<id column="c_id" property="id"/>
+			<result column="c_name" property="name"/>
+		</association>
+	</resultMap>
+
+	<select id="findAll" resultMap="itemMap">
+		SELECT
+			i.id,
+			i.name,
+			i.price,
+			i.deleted_at,
+			i.stock,
+			c.id AS c_id,
+			c.name AS c_name
+		FROM
+			items AS i
+		INNER JOIN
+			categories AS c
+		ON
+			i.category_id = c.id
+	</select>
+	<select id="findById" resultMap="itemMap">
+		SELECT
+			i.id,
+			i.name,
+			i.price,
+			i.deleted_at,
+			i.stock,
+			c.id AS c_id,
+			c.name AS c_name
+		FROM
+			items AS i
+		INNER JOIN
+			categories AS c
+		ON
+			i.category_id = c.id
+		WHERE
+			i.id = #{id}
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO items (id, name, price, category_id) VALUES (nextval('item_id_seq'), #{name}, #{price}, #{category.id})
+	</insert>
+
+	<update id="update">
+		UPDATE items SET name = #{name}, price = #{price}, category_id = #{category.id} WHERE id = #{id}
+	</update>
+
+	<delete id="deleteById">
+		DELETE FROM items WHERE id = #{id}
+	</delete>
+
+</mapper>
